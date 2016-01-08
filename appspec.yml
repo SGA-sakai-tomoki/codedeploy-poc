@@ -1,19 +1,59 @@
 version: 0.0
 os: linux
 files:
-  - source: ./palops.exec
-    destination: /home/ec2-user/opsexec/
+  - source: bin
+    destination: /home/palbkend/bin
+  - source: script
+    destination: /home/palbkend/script
+  - source: etc
+    destination: /home/palbkend/etc
+permissions:
+  - object: /home/palbkend/bin
+    pattern: "*"
+    owner: palbkend
+    group: palapp
+    mode: 755
+    type:
+      - file
+  - object: /home/palbkend/script
+    pattern: "*"
+    owner: palbkend
+    group: palapp
+    mode: 755
+    type:
+      - file
+  - object: /home/palbkend/etc
+    pattern: "*"
+    owner: palbkend
+    group: palapp
+    mode: 644
+    type:
+      - file
+  - object: /home/palbkend
+    pattern: "*"
+    owner: palbkend
+    group: palapp
+    mode: 755
+    type:
+      - directory
 hooks:
   BeforeInstall:
-    - location: scripts/install_dependencies.sh
+    - location: script/before_install.sh
       timeout: 300
-      runas: root
+      runas: palbkend
+  AfterInstall:
+    - location: script/after_install.sh
+      timeout: 300
+      runas: palbkend
   ApplicationStart:
-    - location: scripts/start_server.sh
+    - location: script/start_server.sh
       timeout: 300
-      runas: root
+      runas: palbkend
   ApplicationStop:
-    - location: scripts/stop_server.sh
+    - location: script/stop_server.sh
       timeout: 300
-      runas: root
-
+      runas: palbkend
+  ValidateService:
+    - location: script/validate_service.sh
+      timeout: 300
+      runas: palbkend
